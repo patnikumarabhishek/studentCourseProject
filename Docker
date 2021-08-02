@@ -1,0 +1,5 @@
+FROM openjdk:8-jdk-alpine
+COPY ./target/student-course-registration-api-1.0.0-SNAPSHOT.jar /usr/app/
+EXPOSE 8090
+WORKDIR /usr/app
+ENTRYPOINT ["java","-jar","student-course-registration-api-1.0.0-SNAPSHOT.jar"]

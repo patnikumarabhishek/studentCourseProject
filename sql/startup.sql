@@ -1,0 +1,42 @@
+
+DROP TABLE IF EXISTS `login`;
+
+CREATE TABLE `login` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(250) NOT NULL,
+  `name` varchar(250) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+LOCK TABLES `login` WRITE;
+INSERT INTO `login` VALUES (1,'name','Name kr');
+UNLOCK TABLES;
+
+
+
+DROP TABLE IF EXISTS course;
+create table course(
+COURSE_ID int NOT NULL AUTO_INCREMENT,
+COURSE_NAME varchar(50),
+COURSE_DETAILS varchar(50),
+COURSE_DURATION varchar(50),
+PRIMARY KEY (`COURSE_ID`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+create table student(
+STUDENT_ID int NOT NULL AUTO_INCREMENT,
+STUDENT_NAME varchar(50),
+MOBILE_NUMBER varchar(50),
+ADDRESS varchar(50),
+PRIMARY KEY (`STUDENT_ID`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create table student_course(
+STUDENT_ID int,
+COURSE_ID int,
+CONSTRAINT FK_std
+      FOREIGN KEY (STUDENT_ID) REFERENCES student (STUDENT_ID),
+  CONSTRAINT FK_course
+      FOREIGN KEY (COURSE_ID) REFERENCES course (COURSE_ID)
+)
