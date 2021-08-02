@@ -6,6 +6,6 @@ import java.util.List;
 
 @Data
 public class ReportResponse {
-    private List<StudentDto> studentDtos;
-    private List<CourseResponseDto> courseDtos;
+    private List<StudentDto> students;
+    private List<CourseResponseDto> courses;
 }

@@ -1,6 +1,7 @@
 package com.rootlets.registration.controller;
 
 import com.rootlets.registration.dto.ReportResponse;
+import com.rootlets.registration.dto.StudentDto;
 import com.rootlets.registration.entity.Course;
 import com.rootlets.registration.entity.Student;
 import com.rootlets.registration.service.CourseService;
@@ -16,9 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/report")
@@ -41,24 +41,27 @@ public class ReportApiController {
 
         ReportResponse reportResponse = new ReportResponse();
         List<Student> studentList = null;
-        if (!StringUtils.isEmpty(search) && search.contains("courseName")) {
-            reportResponse.setCourseDtos(Arrays.asList(pojoConverter.convertCourseResponseToDto(courseService.getCourseByCourseName(value).get())));
-            studentList = new LinkedList<>(studentServiceImpl.getStudentsByCourseName(value));
-            reportResponse.setStudentDtos(pojoConverter.studentListToDto(studentList));
+        if (!StringUtils.isEmpty(search) && search.contains("course")) {
+            Optional<Course> course = courseService.courseById(Long.valueOf(value));
+            reportResponse.setCourses(Arrays.asList(pojoConverter.convertCourseResponseToDto(course.get())));
+            List<Long> studentIds = course.get().getStudents().stream().map(student -> student.getStudentId()).collect(Collectors.toList());
+            studentList = new LinkedList<>(studentServiceImpl.getStudentByIds(studentIds));
+            reportResponse.setStudents(pojoConverter.studentListToDto(studentList));
             return reportResponse;
-        } else if (!StringUtils.isEmpty(search) && search.contains("student")) {
+        }  else if (!StringUtils.isEmpty(search) && search.contains("nostudent")) {
+            reportResponse.setCourses(pojoConverter.convertCourseResponseToDto(new LinkedList(courseService.getCourseWithoutStudents())));
+            return reportResponse;
+        }else if (!StringUtils.isEmpty(search) && search.contains("student")) {
             Student studentById = studentServiceImpl.getStudentById(Long.valueOf(value));
-            reportResponse.setStudentDtos(pojoConverter.convertCourseResponseToDto(new LinkedList(studentById.getCourses())));
-            return reportResponse;
-        } else if (!StringUtils.isEmpty(search) && search.contains("nostudent")) {
-            reportResponse.setCourseDtos(pojoConverter.convertCourseResponseToDto(new LinkedList(courseService.getCourseWithoutStudents())));
+            reportResponse.setStudents(Collections.singletonList(pojoConverter.convertStudentToDto(studentById)));
+            reportResponse.setCourses(pojoConverter.convertCourseResponseToDto(new LinkedList(studentById.getCourses())));
             return reportResponse;
         }
 
         studentList = studentServiceImpl.getStudentList();
         List<Course> all = courseService.getAll();
-        reportResponse.setStudentDtos(pojoConverter.studentListToDto(studentList));
-        reportResponse.setCourseDtos(pojoConverter.convertCourseResponseToDto(all));
+        reportResponse.setStudents(pojoConverter.studentListToDto(studentList));
+        reportResponse.setCourses(pojoConverter.convertCourseResponseToDto(all));
         return reportResponse;
     }
 
